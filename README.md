@@ -1,6 +1,13 @@
 # Front-prop
+_"Learn through inference"_.
 
-"Learn through inference".
+**Karol Pajak**
+
+`karol.pajak@gmail.com`
+
+2021
+
+---
 
 This repository contains a Proof of Concept of the Front-prop algorithm.
 
@@ -34,12 +41,14 @@ Front-prop algorithm is partially inspired by the Hebbian theory ([Hebb, 1949](h
 
 ### Detailed description
 
-TODO
+TODO.
+(for now see implementation or contact the author)
+
 
 ---
+---
 
-
-## Author's notes
+## Author's raw notes
 
 ### Ideas
 * if a neuron strays to local optima (gets barely any activations):
