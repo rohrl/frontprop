@@ -1,11 +1,12 @@
 # Front-prop
+
 _"Learn through inference"_.
 
-**Karol Pajak**
+Copyright © 2021 **Karol Pajak**
 
-`karol.pajak@gmail.com`
+---
 
-2021
+**All contents of this repository, including all ideas described here, are the intellectual property of the Author, and any usage or sharing of the ideas or the code without obtaining the Author's permission is strictly prohibited.**
 
 ---
 
@@ -15,9 +16,9 @@ See the [`frontprop_fast.ipynb`](https://github.com/rohrl/frontprop/blob/main/fr
 
 ### Summary
 
-Front-prop is an unsupervised representation learning algorithm which tries to address the limitations of backpropagation listed below.
+Front-prop is a proposal of an unsupervised representation learning algorithm which tries to address some of the limitations of backpropagation (see below).
 
-Learning is done through inference and is unbound. It does not require learning objective, it's aim is to fit to patterns in the incoming data and learn efficient representations of these patterns (a.k.a. embeddings). It can adapt to distribution shift.
+Learning is done through inference and is unbound. It does not require learning objective, it's aim is to fit to patterns in the incoming data and learn efficient representations of these patterns (a.k.a. embeddings). Therefore it should be able to adapt to distribution shifts in real data.
 
 Note that in most cases Front-prop can be adopted to modern Neural Network architectures (e.g. CNNs), by just replacing backpropagation, and therefore it can leverage their well-researched advantages and achievements.
 
@@ -32,6 +33,10 @@ Some of the limitations of backpropagation are:
 1. requirement for explicitely provided expected outputs, 
 1. inability to continuously learn and infer at the same time
 1. learning is bounded (training data is defined upfront and training has to end before inference can start)
+1. distribution shifts between real data and training data
+1. requires saving each layer's forward results to be used for the backward pass
+1. computationally intensive 
+1. requires knowledge of derivatives of each layer
 
 (this list is not exhaustive)
 
@@ -44,8 +49,10 @@ Front-prop algorithm is partially inspired by the Hebbian theory ([Hebb, 1949](h
 TODO.
 (for now see implementation or contact the author)
 
+
 ---
----
+
+
 
 ## Author's raw notes
 
