@@ -17,7 +17,7 @@ See the [`frontprop_fast.ipynb`](https://github.com/rohrl/frontprop/blob/main/fr
 
 Front-prop is an unsupervised representation learning algorithm which tries to address the limitations of backpropagation listed below.
 
-Learning is done through inference and is unbound. It does not require learning objective, it's aim is to fit to patterns in the incoming data and learn efficient representations of these patterns. It can adapt to distribution shift.
+Learning is done through inference and is unbound. It does not require learning objective, it's aim is to fit to patterns in the incoming data and learn efficient representations of these patterns (a.k.a. embeddings). It can adapt to distribution shift.
 
 Note that in most cases Front-prop can be adopted to modern Neural Network architectures (e.g. CNNs), by just replacing backpropagation, and therefore it can leverage their well-researched advantages and achievements.
 
@@ -43,7 +43,6 @@ Front-prop algorithm is partially inspired by the Hebbian theory ([Hebb, 1949](h
 
 TODO.
 (for now see implementation or contact the author)
-
 
 ---
 ---
