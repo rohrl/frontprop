@@ -25,7 +25,8 @@ Some of the limitations of backpropagation are:
 1. requirement for explicitely provided expected outputs, 
 1. inability to continuously learn and infer at the same time
 1. learning is bounded (training data is defined upfront and training has to end before inference can start)
-(this is not exhaustive list)
+
+(this list is not exhaustive)
 
 
 Front-prop algorithm is partially inspired by the Hebbian theory ([Hebb, 1949](https://en.wikipedia.org/wiki/Organization_of_Behavior)) of how neurons in the brain operate and by the Perceptron ([McCulloch, Pitts, 1943](https://www.bibsonomy.org/bibtex/13e8e0d06f376f3eb95af89d5a2f15957/schaul)).
