@@ -1,6 +1,8 @@
 ## Author's raw notes
 
 ### Ideas
+* implement "repultion mechanism" to "dedup" neurons with similar weights (real brain has sth like that - [Lateral Inhibition](https://en.wikipedia.org/wiki/Lateral_inhibition)
+
 * if a neuron strays to local optima (gets barely any activations):
   * randomise weights gradually, or
   * "shock therapy" - re-initialise with random weights
