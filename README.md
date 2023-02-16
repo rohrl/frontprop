@@ -18,17 +18,17 @@ See the [`frontprop_fast.ipynb`](https://github.com/rohrl/frontprop/blob/main/fr
 
 Front-prop is a proposal of an unsupervised representation learning algorithm which tries to address some of the limitations of backpropagation (see below).
 
-Learning is done through inference and is unbound. It does not require learning objective, it's aim is to fit to patterns in the incoming data and learn efficient representations of these patterns (a.k.a. embeddings). Therefore it should be able to adapt to distribution shifts in real data.
+Learning is done through inference only, and is unbound. It does not require learning objective. It is achieved by continously fitting to patterns in the incoming data and learn efficient representations of these patterns (a.k.a. embeddings). Therefore it should be able to adapt to distribution shifts in real data.
 
-Note that in most cases Front-prop can be adopted to modern Neural Network architectures (e.g. CNNs), by just replacing backpropagation, and therefore it can leverage their well-researched advantages and achievements.
+Note that in most cases Front-prop can be adopted to modern Neural Network architectures (e.g. CNNs), just by replacing backpropagation. Hence it should be possible to leverage their well-researched advantages and achievements in the field.
 
 ### Motivation
 
-The motivation behind Front-prop is to seek alternative learning algorithms to backpropagation, which are more similar to how humans and other intelligent beings learn. The goal is to find ones that are better suited for achieving AGI, than backpropagation.
+The motivation behind Front-prop is to seek alternative learning algorithms to backpropagation, which are more similar to how humans and other intelligent beings learn, in order to find ones that are better suited for achieving AGI.
 
-Backpropagation is wonderful learning algorithm and has been the foundation of the latest breakthroughs in AI. But it suffers from several constraints that make it unlikely to be the way how real, biological brains work and probably insufficient for AGI  ([LeCun, 2022](https://openreview.net/pdf?id=BZ5a1r-kVsf); [Hinton, 2022](https://www.cs.toronto.edu/~hinton/FFA13.pdf)). 
+Backpropagation has been the foundation of Deep Learning and all its latest breakthroughs in AI. But it suffers from several constraints that make it unlikely to be the way how real, biological brains work and probably insufficient for AGI ([LeCun, 2022](https://openreview.net/pdf?id=BZ5a1r-kVsf); [Hinton, 2022](https://www.cs.toronto.edu/~hinton/FFA13.pdf)). 
 
-Some of the limitations of backpropagation are: 
+Some of the limitations of backpropagation are (not exhaustive):
 1. complete separation of training phase and inference phase (sepearation in time, in data, and in how each operates),
 1. requirement for explicitely provided expected outputs, 
 1. inability to continuously learn and infer at the same time
@@ -37,9 +37,6 @@ Some of the limitations of backpropagation are:
 1. requires saving each layer's forward results to be used for the backward pass
 1. computationally intensive 
 1. requires knowledge of derivatives of each layer
-
-(this list is not exhaustive)
-
 
 Front-prop algorithm is partially inspired by the Hebbian theory ([Hebb, 1949](https://en.wikipedia.org/wiki/Organization_of_Behavior)) of how neurons in the brain operate and by the Perceptron model ([McCulloch, Pitts, 1943](https://www.bibsonomy.org/bibtex/13e8e0d06f376f3eb95af89d5a2f15957/schaul)).
 
