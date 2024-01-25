@@ -16,23 +16,29 @@ See the [`frontprop_fast.ipynb`](https://github.com/rohrl/frontprop/blob/main/fr
 
 ### Summary
 
-Front-prop is a proposal of an unsupervised representation learning algorithm which tries to address some of the limitations of backpropagation (see below).
+Front-prop is a an unsupervised learning algorithm which addresses some of the limitations of backpropagation (see below). Due to unsupervised nature, it does not try to optimise for specific expected output or a specific task, bur rather aims to produce useful representations of inputs, regardless of the domain. Useful in the sense of capturing common patterns in the input data, which can be viewed as a way of (lossy) compression of the input data. As such there is no explicit training objective and learning achieved by continously fitting to patterns in the incoming data and producing efficient representations of these patterns (a.k.a. embeddings).
 
-Learning is done through inference only, and is unbound. It does not require learning objective. It is achieved by continously fitting to patterns in the incoming data and learn efficient representations of these patterns (a.k.a. embeddings). Therefore it should be able to adapt to distribution shifts in real data.
+There is no separation between training and inference - there is only forward pass (hence "front prop") and each pass changes the network, to continously adapt it to incoming data - not unlike how organic brains are understood to work. 
+Consequently there is also no stop condition, and therefore the algorithm should naturally handle distribution shifts **[unverified]**, which are present in real world environments.
 
-Note that in most cases Front-prop can be adopted to modern Neural Network architectures (e.g. CNNs), just by replacing backpropagation. Hence it should be possible to leverage their well-researched advantages and achievements in the field.
+Note that in most cases Front-prop should be easy to adopt to modern Neural Network architectures (e.g. CNNs, Transformers), just by replacing backpropagation, without compromising the model architecture **[unverified]**.
+It should also be less compute/memory demanding, as it does not have to store gradient information, nor perform backward pass **[unverified]**.
+
+### Results
+
+TODO
 
 ### Motivation
 
 The motivation behind Front-prop is to seek alternative learning algorithms to backpropagation, which are more similar to how humans and other intelligent beings learn, in order to find ones that are better suited for achieving AGI.
 
-Backpropagation has been the foundation of Deep Learning and all its latest breakthroughs in AI. But it suffers from several constraints that make it unlikely to be the way how real, biological brains work and probably insufficient for AGI ([LeCun, 2022](https://openreview.net/pdf?id=BZ5a1r-kVsf); [Hinton, 2022](https://www.cs.toronto.edu/~hinton/FFA13.pdf)). 
+Backpropagation has been the foundation of Deep Learning and all its latest breakthroughs in AI. But it suffers from several constraints that make it unlikely to be the way how biological brains learn in nature and probably insufficient for AGI ([LeCun, 2022](https://openreview.net/pdf?id=BZ5a1r-kVsf); [Hinton, 2022](https://www.cs.toronto.edu/~hinton/FFA13.pdf)). 
 
 Some of the limitations of backpropagation are (not exhaustive):
-1. complete separation of training phase and inference phase (sepearation in time, in data, and in how each operates),
-1. requirement for explicitely provided expected outputs, 
+1. strict separation between training phase and inference phase (sepearation in time, in data, and in kinds of operations),
+1. necessity to either explicitely provide expected outputs, or a task/domain-specific loss function 
 1. inability to continuously learn and infer at the same time
-1. learning is bounded (training data is defined upfront and training has to end before inference can start)
+1. necessity to obtain all training data upfront, and before inference phase
 1. distribution shifts between real data and training data
 1. requires saving each layer's forward results to be used for the backward pass
 1. computationally intensive 
