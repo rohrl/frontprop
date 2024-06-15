@@ -1,0 +1,8 @@
+# TODO: fix versions
+torch
+numpy
+matplotlib
+scipy
+sklearn
+tqdm
+wandb
