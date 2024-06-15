@@ -3,6 +3,6 @@ torch
 numpy
 matplotlib
 scipy
-sklearn
+scikit-learn
 tqdm
 wandb

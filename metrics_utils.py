@@ -2,8 +2,9 @@ import wandb
 
 
 def init_wandb(w_boost: float, t_decay: float,
-               project="frontprop", dataset="MNIST",
-               epochs=1, architecture="FC"):
+               neurons: int, iterations: int,
+               project: str, dataset: str,
+               architecture="FC"):
     # start a new wandb run to track this script
     wandb.init(
         # set the wandb project where this run will be logged
@@ -14,7 +15,8 @@ def init_wandb(w_boost: float, t_decay: float,
             "threshold_decay": t_decay,
             "architecture": architecture,
             "dataset": dataset,
-            "epochs": epochs,
+            "iterations": iterations,
+            "neurons": neurons
         }
     )
 
