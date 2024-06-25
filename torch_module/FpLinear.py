@@ -58,6 +58,8 @@ class FpLinear(nn.Linear):
         data_vector = data.expand(self.out_features, -1)
         data_vector = self.__normalise_unitary(data_vector)
 
+        # dot product of input and weights
+        # (equivalent to cos_sim because both are unit vectors)
         output = torch.sum(data_vector * self.weight, dim=1)
 
         assert torch.all(output > -1.01) and torch.all(output < 1.01)
