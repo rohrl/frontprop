@@ -114,6 +114,10 @@ class FpLinear(nn.Linear):
         self.frozen = False
 
 
+    def get_size(self):
+        return (self.in_features, self.out_features)
+
+
     def __assert(self):
         assert self.weight.shape == (self.out_features, self.in_features)
         assert self.t.shape == (self.out_features,)
