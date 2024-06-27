@@ -21,6 +21,12 @@ data/MNIST/raw/train-labels-idx1-ubyte.gz
 mess/.ipynb_checkpoints/frontprop-checkpoint.ipynb
 mess/.ipynb_checkpoints/mnist-checkpoint.ipynb
 
+wandb/
+
+venv*/
+
+.idea/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

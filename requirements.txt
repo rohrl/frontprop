@@ -1,7 +1,8 @@
-# TODO: fix versions
+# TODO: pin versions
 torch
 numpy
 matplotlib
+seaborn
 scipy
 scikit-learn
 tqdm
