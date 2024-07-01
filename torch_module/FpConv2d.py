@@ -17,8 +17,8 @@ class FpConv2d(nn.Conv2d):
             raise Exception("Dilation not supported for FrontPropConv2d")
         if groups != 1:
             raise Exception("Groups not supported for FrontPropConv2d")
-        
-        
+
+
         super(FpConv2d, self).__init__(in_channels, out_channels, kernel_size, stride, padding, dilation, groups, bias, padding_mode, device, dtype)
 
         # learning is through front propagation only
@@ -34,11 +34,11 @@ class FpConv2d(nn.Conv2d):
             raise Exception("Non-square stride not supported for FrontPropConv2d")
         if self.padding[0] != self.padding[1]:
             raise Exception("Non-square padding not supported for FrontPropConv2d")
-        
+
         self.kernel_size = self.kernel_size[0]
         self.stride = self.stride[0]
         self.padding = self.padding[0]
-        
+
         self.device = device
 
         # hyper params
@@ -47,12 +47,12 @@ class FpConv2d(nn.Conv2d):
 
         self.frozen = False
 
-        assert self.t_decay > 0        
+        assert self.t_decay > 0
         assert self.w_boost > 0
 
         # see lazy_init_thresholds()
         self.t = None
-    
+
 
     def lazy_init_thresholds(self, out_h, out_w):
         if self.t is None:
@@ -61,7 +61,7 @@ class FpConv2d(nn.Conv2d):
 
     def __normalise_unitary(self, data, dim):
         return data / torch.norm(data, dim=dim, keepdim=True)
-    
+
 
     def __get_weights_boost(self, kernel_idx, data_tensor):
         # FIXME: can i use this addition, or do i need to use the angle?
@@ -73,13 +73,13 @@ class FpConv2d(nn.Conv2d):
         w_boost = self.w_boost * (data_tensor - kernel_weights)
 
         return w_boost
-    
+
 
     def __get_input_patch(self, sample, out_h, out_w):
         in_h = out_h * self.stride - self.padding
         in_w = out_w * self.stride - self.padding
         return sample[:, in_h : in_h + self.kernel_size, in_w : in_w + self.kernel_size]
-    
+
 
     def forward(self, mini_batch):
 
@@ -96,7 +96,7 @@ class FpConv2d(nn.Conv2d):
     def forward_single(self, sample):
 
         assert sample.shape[0] == self.in_channels
-        
+
         output = F.conv2d(sample.unsqueeze(0), self.weight, self.bias, self.stride, self.padding, self.dilation, self.groups).squeeze()
 
         self.lazy_init_thresholds(output.shape[-2], output.shape[-1])
@@ -106,7 +106,7 @@ class FpConv2d(nn.Conv2d):
         # ReLU-like non-linear transformation via cutoff threshold
         output = torch.where(output >= self.t, output, torch.zeros_like(output))
 
-        
+
         # Learning happens below:
         #
         #   For each location where the threshold was exceeded, update the weights.
@@ -127,7 +127,7 @@ class FpConv2d(nn.Conv2d):
         #   * Try removing loops
         #   * maybe use torch.sparse_coo_tensor() to save memory
         if not self.frozen:
-            
+
             # Update weights:
 
             excitations_idxs = torch.nonzero(output)
@@ -146,10 +146,10 @@ class FpConv2d(nn.Conv2d):
                 assert self.weight[kernel_idx].shape == (self.in_channels, self.kernel_size, self.kernel_size)
 
             # Update thresholds:
-                
-            self.binary_excitations = (output >= 0)
+
+            binary_excitations = (output > 0)
             # where threshold exceeded set it to the new value
-            self.t = self.binary_excitations * output + ~self.binary_excitations * self.t
+            self.t = binary_excitations * output + ~binary_excitations * self.t
             # decay all thresholds
             self.t = self.t * (1.0 - self.t_decay)
 
@@ -162,7 +162,7 @@ class FpConv2d(nn.Conv2d):
 
     def freeze(self):
         self.frozen = True
-            
+
 
     def unfreeze(self):
         self.frozen = False
