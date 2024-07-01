@@ -7,12 +7,14 @@ import torch.nn.functional as F
 T_DECAY_DEFAULT = 0.0005
 W_BOOST_DEFAULT = 0.02
 
+
 class FpLinear(nn.Linear):
 
-    def __init__(self, in_features, out_features, bias=False, t_decay=T_DECAY_DEFAULT, w_boost=W_BOOST_DEFAULT, device=None, dtype=None):
+    def __init__(self, in_features, out_features, bias=False, t_decay=T_DECAY_DEFAULT, w_boost=W_BOOST_DEFAULT,
+                 device=None, dtype=None):
         if bias:
             raise Exception("Bias not supported for FrontPropLinear")
-        
+
         super(FpLinear, self).__init__(in_features, out_features, bias=False, device=device, dtype=dtype)
 
         # learning is through front propagation only
@@ -31,16 +33,14 @@ class FpLinear(nn.Linear):
 
         self.frozen = False
 
-        assert self.t_decay > 0        
+        assert self.t_decay > 0
         assert self.w_boost > 0
 
         # init thresholds
         self.t = torch.ones(out_features, device=device, dtype=self.weight.dtype)
-    
 
     def __normalise_unitary(self, data, dim=1):
         return data / torch.norm(data, dim=dim, keepdim=True)
-    
 
     def __get_weights_boost(self, data_vector):
         assert data_vector.shape == self.weight.shape
@@ -51,10 +51,9 @@ class FpLinear(nn.Linear):
 
         assert w_boost.shape == self.weight.shape
         return w_boost
-    
 
     def forward_single_sample(self, data):
-        
+
         data_vector = data.expand(self.out_features, -1)
         data_vector = self.__normalise_unitary(data_vector)
 
@@ -71,11 +70,10 @@ class FpLinear(nn.Linear):
             self.weight.data = self.__normalise_unitary(self.weight)
             self.t = self.excitations * output + (1.0 - self.excitations) * self.t
             self.t = self.t * (1.0 - self.t_decay)
-       
+
         self.__assert()
-        
+
         return output
-    
 
     def forward(self, input):
         # FIXME:
@@ -90,7 +88,7 @@ class FpLinear(nn.Linear):
             self.output[i] = sample_out
 
         assert self.output.shape == (input.shape[0], self.out_features)
-    
+
         # ReLU-like non-linear transformation via cutoff threshold
         #
         #   TODO: Should we output the absolute value or only the diff above threshold ?
@@ -105,24 +103,21 @@ class FpLinear(nn.Linear):
     def backward(self, grad_output):
         raise Exception("Backward pass not implemented for FrontPropConv2d")
 
-
     def freeze(self):
         self.frozen = True
-            
 
     def unfreeze(self):
         self.frozen = False
 
-
     def get_size(self):
         return (self.in_features, self.out_features)
-
 
     def __assert(self):
         assert self.weight.shape == (self.out_features, self.in_features)
         assert self.t.shape == (self.out_features,)
 
-        assert torch.allclose(torch.norm(self.weight, dim=1), torch.ones(self.out_features, device=self.device), atol=1e-5)
+        assert torch.allclose(torch.norm(self.weight, dim=1), torch.ones(self.out_features, device=self.device),
+                              atol=1e-5)
         assert torch.all(self.t > 0)
 
         assert self.excitations.shape == (self.out_features,)
