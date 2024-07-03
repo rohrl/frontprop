@@ -79,7 +79,6 @@ class FpConv2d(nn.Conv2d):
         return sample[:, in_h: in_h + self.kernel_size, in_w: in_w + self.kernel_size]
 
     def forward(self, mini_batch):
-
         # TODO: currently mini batch is done sequentially
 
         outputs = []
@@ -90,12 +89,34 @@ class FpConv2d(nn.Conv2d):
 
         return torch.stack(outputs)
 
+    def __get_sample_lengths(self, sample_1batched):
+        """
+        Sum of dot product with itself gives the length of the vector.
+        Compute lengths per each location.
+        """
+        sample_sq = sample_1batched * sample_1batched
+        # divisor_override=1 turns avg_pool into sum_pool
+        sample_sq_sums = torch.nn.functional.avg_pool2d(sample_sq,
+                                                        kernel_size=self.kernel_size,
+                                                        stride=self.stride,
+                                                        padding=self.padding,
+                                                        divisor_override=1)
+        sample_lengths = torch.sqrt(sample_sq_sums)
+        return sample_lengths.squeeze()
+
     def forward_single(self, sample):
 
         assert sample.shape[0] == self.in_channels
 
-        output = F.conv2d(sample.unsqueeze(0), self.weight, self.bias, self.stride, self.padding, self.dilation,
+        sample_1batched = sample.unsqueeze(0)
+        output = F.conv2d(sample_1batched, self.weight, self.bias, self.stride, self.padding, self.dilation,
                           self.groups).squeeze()
+
+        # We wanted input to be normalised too, but it wasn't (because would have to do it per each position separately)
+        # Weights were normalised though, so to correct the result we just need to divide it
+        # by the lengths of inputs at each position.
+        sample_lengths = self.__get_sample_lengths(sample_1batched)
+        output /= sample_lengths
 
         self.lazy_init_thresholds(output.shape[-2], output.shape[-1])
 
@@ -111,7 +132,7 @@ class FpConv2d(nn.Conv2d):
         #   and thresholds are set to the new value where the threshold was exceeded.
         #   Thresholds are also decayed by a small amount on each pass.
         #
-        #   Convolution kernels' weights are updated in random order of locations.
+        #   --Convolution kernels' weights are updated in random order of locations.-- (disabled)
         #
         #   The output is equal to the activation above the threshold (or zero if below threshold).
         #
@@ -119,7 +140,6 @@ class FpConv2d(nn.Conv2d):
         #   TODO: Should we output the absolute value or only the diff above threshold ?
         #   (note the threshold changes on each pass)
         #
-        #   FIXME: all inputs should be first normalised - this is tricky
         #   TODO: Optimise this
         #   * Try removing loops
         #   * maybe use torch.sparse_coo_tensor() to save memory
@@ -128,16 +148,16 @@ class FpConv2d(nn.Conv2d):
             # Update weights:
 
             excitations_idxs = torch.nonzero(output)
-            # shuffle indices randomly
-            excitations_idxs = excitations_idxs[torch.randperm(excitations_idxs.shape[0])]
+
+            # --shuffle indices randomly-- (disabled)
+            # excitations_idxs = excitations_idxs[torch.randperm(excitations_idxs.shape[0])]
+
             # iterate locations where threshold exceeded and shift weights closer to the input
             for kernel_idx, h, w in excitations_idxs:
-                data_tensor = self.__get_input_patch(sample, h, w)
-                assert data_tensor.shape == (self.in_channels, self.kernel_size, self.kernel_size)
-                data_tensor = self.__normalise_unitary(data_tensor, dim=(1, 2))
-                assert data_tensor.shape == (self.in_channels, self.kernel_size, self.kernel_size)
+                data_tensor_norm = self.__get_input_patch(sample, h, w) / sample_lengths[h, w]
+                assert data_tensor_norm.shape == (self.in_channels, self.kernel_size, self.kernel_size)
                 # update weights
-                self.weight[kernel_idx] += self.__get_weights_boost(kernel_idx, data_tensor)
+                self.weight[kernel_idx] += self.__get_weights_boost(kernel_idx, data_tensor_norm)
                 # normalise weights
                 self.weight[kernel_idx] = self.__normalise_unitary(self.weight[kernel_idx], dim=(1, 2))
                 assert self.weight[kernel_idx].shape == (self.in_channels, self.kernel_size, self.kernel_size)

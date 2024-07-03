@@ -86,12 +86,12 @@ class SimplePatterns:
             pattern += torch.randn_like(pattern) * noise
             return pattern
 
-        return SimplePatterns.ALL_PATTERNS[idx]
+        return SimplePatterns.ALL_PATTERNS[idx].clone()
 
     @staticmethod
     def get_all_patterns(n: int = None) -> List[torch.Tensor]:
         n = n or len(SimplePatterns.ALL_PATTERNS)
-        return SimplePatterns.ALL_PATTERNS[:n]
+        return [t.clone() for t in SimplePatterns.ALL_PATTERNS[:n]]
 
     @staticmethod
     def get_all_patterns_count():
