@@ -1,8 +1,5 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-
-# TODO: normalise input and weights + use gaussian initialisation
 
 T_DECAY_DEFAULT = 0.0005
 W_BOOST_DEFAULT = 0.02
@@ -53,6 +50,9 @@ class FpLinear(nn.Linear):
         return w_boost
 
     def forward_single_sample(self, data):
+
+        if torch.all(data == 0):
+            return torch.zeros(self.out_features, device=self.device, dtype=self.weight.dtype)
 
         data_vector = data.expand(self.out_features, -1)
         data_vector = self.__normalise_unitary(data_vector)
