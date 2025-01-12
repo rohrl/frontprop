@@ -1,14 +1,7 @@
-# Front-prop
+# Frontprop
 
 _"Learn through inference"_.
 
-Copyright © 2021 **Karol Pajak**
-
----
-
-**All contents of this repository, including all ideas described here, are the intellectual property of the Author, and any usage or sharing of the ideas or the code without obtaining the Author's permission is strictly prohibited.**
-
----
 
 This repository contains a Proof of Concept of the Front-prop algorithm.
 
@@ -52,7 +45,14 @@ Front-prop algorithm is partially inspired by the Hebbian theory ([Hebb, 1949](h
 TODO.
 (for now see implementation or contact the author)
 
+## Citation
 
----
-
-Copyright © 2021 **Karol Pajak**
+If you find this repository useful in your research, please consider citing:
+```
+@software{frontprop,
+  author = {Pajak, K.},
+  title = {Frontprop},
+  url = {https://github.com/rohrl/frontprop},
+  year = {2024}
+}
+```
