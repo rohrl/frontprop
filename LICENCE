@@ -1,5 +1,8 @@
 # LICENSE
 
+## Author: Karol Pajak
+## Copyright (c) 2024 Karol Pajak
+
 ## Code License: GPL-3.0
 
 The code in this repository is licensed under the GNU General Public License v3.0 (GPL-3.0).
@@ -18,7 +21,7 @@ You are free to:
 - Adapt: Remix, transform, and build upon the material for any purpose
 
 As long as you:
-- Provide proper attribution to the author(s).
+- Provide proper attribution to the author.
 
 The full text of the Creative Commons Attribution 4.0 International License can be found here:
 https://creativecommons.org/licenses/by/4.0/
