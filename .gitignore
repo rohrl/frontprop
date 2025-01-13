@@ -18,8 +18,8 @@ data/MNIST/raw/train-labels-idx1-ubyte.gz
 .ipynb_checkpoints/frontprop_fast-checkpoint.ipynb
 .ipynb_checkpoints/notes-checkpoint.md
 .ipynb_checkpoints/sandpit-checkpoint.ipynb
-mess/.ipynb_checkpoints/frontprop-checkpoint.ipynb
-mess/.ipynb_checkpoints/mnist-checkpoint.ipynb
+sandpit/.ipynb_checkpoints/frontprop-checkpoint.ipynb
+sandpit/.ipynb_checkpoints/mnist-checkpoint.ipynb
 
 wandb/
 

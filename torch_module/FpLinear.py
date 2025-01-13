@@ -6,6 +6,11 @@ W_BOOST_DEFAULT = 0.02
 
 
 class FpLinear(nn.Linear):
+    """
+    This is an implementation of Frontprop fully connected layer, as a torch module.
+    Can be used as a direct replacement of nn.Linear layer.
+    At the moment bias is not supported.
+    """
 
     def __init__(self, in_features, out_features, bias=False, t_decay=T_DECAY_DEFAULT, w_boost=W_BOOST_DEFAULT,
                  device=None, dtype=None):
@@ -37,6 +42,9 @@ class FpLinear(nn.Linear):
         self.t = torch.ones(out_features, device=device, dtype=self.weight.dtype)
 
     def __normalise_unitary(self, data, dim=1):
+        """
+        Normalise data to a unit vector.
+        """
         return data / torch.norm(data, dim=dim, keepdim=True)
 
     def __get_weights_boost(self, data_vector):
