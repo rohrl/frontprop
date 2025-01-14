@@ -30,7 +30,7 @@ Frontprop should also be less compute/memory demanding **[unverified]**, as it d
 TODO: demo notebook
  [`frontprop_fast.ipynb`](https://github.com/rohrl/frontprop/blob/main/frontprop_fast.ipynb) notebook for a quick demo.
 
-Frontprop is a modification of the original Hebb's rule (which is the commonly held belief on how neurons in our brains learn), applied to the artifical neuron - [Perceptron](https://en.wikipedia.org/wiki/Perceptron).
+Frontprop is a modification of the original [Hebb's rule](https://en.wikipedia.org/wiki/Hebbian_theory) (which is the commonly held belief on how neurons in our brains learn), applied to the artifical neuron - [Perceptron](https://en.wikipedia.org/wiki/Perceptron).
 
 Hebb's rule states that learning process in neurons is a consequence of reinforcing connections (synapses) that contributed to neuron firing (excitation).
 
@@ -53,7 +53,7 @@ then the result (scalar) is added to bias `b`, which is then fed into activation
 $y = \phi(\mathbf{w} \cdot \mathbf{x} + b)$
 
 A layer is a collection of such neurons, which receive same input `x`, and so the layer is represented by a weight **matrix** `W` - a stack of all layer's neurons weights, bias **vector** `b` and a shared activation function.
-The layer output is a **vector** of individual neurons outputs.
+The layer's output is a **vector** of all individual neurons outputs.
 
 $\mathbf{y} = \phi(\mathbf{W} \mathbf{x} + \mathbf{b})$
 
@@ -64,34 +64,136 @@ Currently Frontprop also implements a convolutional layer [`FpConv2d`](./torch_m
 
 #### Learning algorithm and weight update rule
 
-TODO 
+[*the logic described in this section is subject to ongoing experimentation and may change*]
+
+Unlike in global gradient backpropagation, learning in Frontprop is localised to a neuron, simply:
 
 ```
-if.. then
-else ..
+if (w * x) > excitation_threshold:
+  update_neuron_weights()
+  excitation_threshold = w * x
+  output = w * x
+else:
+  excitation_threshold *= (1 - threshold_decay)
+  output = 0
 ```
 
-$formula$
+`x * w` is simply a dot product of input and neuron's weights.
 
-most similar to Oja's rule, which is known to find principal components of the input. 
+`excitation_threshold` is a scalar, part of internal neuron state, alongside with its weights.
 
-Intuition:
+If neuron was activated (excited) with the input (i.e. the product exceeded the activation threshold),
+the weights are updated (see the update rule [below](#update-rule)) and the product is the output
+(the "job" of activation function is implicitly realised by the excitation threshold, explained [below](#activation-function).
 
-#### Normalization
+If the neuron was not activated, the activation threshold is lowered by a small amount, and the output is `0`.
 
-...
+Neurons weights are randomly initialized at the beginning of the training.
+
+#### Update rule
+
+Weights are updated following the Hebb's principle, i.e. reinforce the connections that contributed to the activation.
+This can be implemented in a multitude of ways, but I found the following simple logic to work well:
+
+$\Delta\mathbf{w} = \lambda(\mathbf{x} - \mathbf{w})$
+
+$\mathbf{w} := \mathbf{w} + \Delta\mathbf{w}$
+
+where the change is simply a vector subtraction (in high dimensional space), 
+scaled by the learning rate $\lambda$ (which in code is called `weight_boost`).
+
+![](https://upload.wikimedia.org/wikipedia/commons/2/24/Vector_subtraction.svg)
+
+In other words, we are moving the weight vector **slightly** closer to the input vector,
+which will result in neuron being "more sensitive" to this input,
+increasing the chance of activations from this or similar inputs.
+
+Our simple update rule is in fact similar to [Oja's rule](https://en.wikipedia.org/wiki/Oja%27s_rule):
+
+$\Delta\mathbf{w} = \lambda y (\mathbf{x} - y \mathbf{w})$
+
+except in Oja's rule:
+1. weights are always updated and the update "strength" is proportional to the activation (1st $y$), 
+while in Frontprop it's discrete: no update if activation is below the threshold,
+2. the update vector is additionally "boosted" by the activation "strength" (2nd $y$)
+
+Lastly, we set the `excitation_threshold` to be at the level of the output, which caused the neuron to fire.
+
+#### Intuition
+
+The intuition is that we can think of inputs and outputs, and weights,
+as points in the high-dimensional embedding space, representing some abstract meaning.
+
+At the beginning there is hardly any activations, so neurons keep lowering their thresholds.
+
+Imagine the neuron's weight vector as a point in this space, and activation threshold being
+a radius of a hypersphere centered in that point.
+
+The hypersphere radius keeps growing (i.e. threshold lowering) until it spans a region of input space
+where signals happen to be present. This will cause the neuron to fire, and so trigger
+the weight update, which will effectively move the hypersphere slightly closer to the input.
+
+Eventually, neurons will specialise in firing for repeating/dominant patterns in inputs,
+and the random initialisation provides some initial coverage of the space to "spread" the search.
+
+If input distribution changes and new patterns emerge, neurons will adapt again by "growing their hypersphere radius", 
+if not excited.
+
+This process is somewhat similar to clustering algorithms, like KMeans, but expressed as
+neuronal behaviour (Hebb's rule).
+
+One drawback of the current logic is that multiple neurons may converge in the same spot,
+but implementing some form of [Lateral Inhibition](https://en.wikipedia.org/wiki/Lateral_inhibition) (which reportedly also takes place in the brain),
+for example via some "repelling force" or total energy minimisation, should prevent it
+(early "brute-force" implementation of this have shown that it does improve performance).
+
+Another weakness is that rare patterns will not attract neurons as much as frequent patterns
+(though this does not seem to be a strong effect, see below in [Observations](#observations)).
+The above Lateral Inhibition should help, but perhaps optimising some entropy-inspired layer-wise energy
+could be another solution 
+(as in rare patterns carrying more information, which can be measured using [Shannon entropy](https://en.wikipedia.org/wiki/Entropy_(information_theory)))
+(<- TODO).
+
+#### On activation function and bias
+
+In contrast to the original Perceptron, or a typical layer in ML models,
+Frontprop neurons don't use an activation function and bias.
+
+Non-linear activation function is critical in ML models, otherwise the entire computation
+would reduce to a linear transformation (each layer performing one, which stacked together is still a linear transformation).
+
+The "job" of non-linear activation function is performed by the activation threshold in Frontprop.
+Its non linear behaviour (zeroing the output when neuron did not fire) is very similar to the popular 
+[`ReLU`](https://en.wikipedia.org/wiki/Rectifier_(neural_networks)) activation function used broadly in ML models.
+
+When it comes to the lack of *bias* in Frontprop layers, it has been evidenced by well performing models, like Llama,
+that bias is not necessary.
 
 #### Hyperparameters
 
-...
+There are 2 global hyperparameters that control learning process speed and the level of specialisation of neurons:
+1. `weight_boost` (i.e. the learning rate used in weight update)
+2. `threshold_decay` which is the neurons' thresholds drop off rate (when not activated)
 
----
+#### Normalization
+
+To avoid the problem of weights reducing to zero or exploding to infinity, inputs are expected to be
+normalised to unitary vectors. Same normalisation is applied to weights and outputs.
+This may not be necessary though, as the algorithm used to work without it.
 
 ## Observations
 
 Frontprop is still very much work in progress, but some early, promising observations have been made.
 
+TODO: converging on simple patterns (+stability)
+
+TODO: pattern probability and noise impact
+
+TODO: comparison to unsupervised (log probe, knn)
+
 TODO: plot neurons count vs score on MNIST
+
+TOOD: conv layer detecting patterns
 
 ---
 
@@ -160,8 +262,9 @@ Perhaps looking beyond just backpropagation, and drawing more knowledge from nat
 #### Efficiency
 
 Furthermore, current training techniques of large models are insanely energy demanding and any efficiency optimisations there would be very welcome.
-Backpropagation not only requires a lot of compute resources, but due to the global gradient propagation they need to be highly centralised,
+Backpropagation not only requires a lot of compute resources, but due to the global gradient propagation they are highly centralised,
 with high bandwidth connections, resulting in very expensive datacenters with mind-blowing energy and cooling requirements.
+While there is a growing research on decentralised training, it is still in its infancy and difficult to make it work with backpropagation.
 
 Training techniques that use only local learning, like Frontprop, if proven to work, could facilitate massively distributed and decentralised training,
 which is much more efficient, cheaper, more sustainable and eco-friendly, and will unlock next level scale of compute
@@ -171,17 +274,15 @@ which is much more efficient, cheaper, more sustainable and eco-friendly, and wi
 
 ## Other backpropagation alternatives
 
-
-| Method                                                                                                                                                     | Supervised | MNIST acc    | similarities | differences |
-|------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|--------------|--------------|-------------|
-| [Forward-Forward](https://arxiv.org/abs/2212.13345)                                                                                                        | no         | 98-99% (MLP) |              |             |
-| [Signal Propagation](https://arxiv.org/abs/2204.01723)                                                                                                     | yes        |              |              |             |
-| [Oja's Rule](https://en.wikipedia.org/wiki/Oja%27s_rule) and [generalized Hebbian algorithm](https://en.wikipedia.org/wiki/Generalized_Hebbian_algorithm)  | no         |              |              |             |
-| [Boltzman machines](https://en.wikipedia.org/wiki/Boltzmann_machine)                                                                                       | both       |              |              |             | 
-| [Generalised Hebbian Algorithm (Sanger's Rule)](https://en.wikipedia.org/wiki/Generalized_Hebbian_algorithm)                                               | no         |              |              |             |
-| [Equilibrium Propagation](https://arxiv.org/abs/1602.05179)                                                                                                | yes        |              |              |             |
-| Spiking networks                                                                                                                                           |            |              |              |             | 
-
+| Method                                                                                                                                                    | Supervised | MNIST acc    | similarities | differences |
+|-----------------------------------------------------------------------------------------------------------------------------------------------------------|------------|--------------|--------------|-------------|
+| [Forward-Forward](https://arxiv.org/abs/2212.13345)                                                                                                       | no         | 98-99% (MLP) |              |             |
+| [Signal Propagation](https://arxiv.org/abs/2204.01723)                                                                                                    | yes        |              |              |             |
+| [Oja's Rule](https://en.wikipedia.org/wiki/Oja%27s_rule) and [generalized Hebbian algorithm](https://en.wikipedia.org/wiki/Generalized_Hebbian_algorithm) | no         |              |              |             |
+| [Boltzman machines](https://en.wikipedia.org/wiki/Boltzmann_machine)                                                                                      | both       |              |              |             | 
+| [Generalised Hebbian Algorithm (Sanger's Rule)](https://en.wikipedia.org/wiki/Generalized_Hebbian_algorithm)                                              | no         |              |              |             |
+| [Equilibrium Propagation](https://arxiv.org/abs/1602.05179)                                                                                               | yes        |              |              |             |
+| Spiking networks                                                                                                                                          |            |              |              |             | 
 
 ---
 
@@ -196,7 +297,7 @@ which is much more efficient, cheaper, more sustainable and eco-friendly, and wi
 
 ## Citation
 
-If you find this repository useful in your research, please consider citing:
+If you find this work useful in your research, please consider citing:
 
 ```
 @software{frontprop,
