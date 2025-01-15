@@ -10,9 +10,9 @@ fully unsupervised, and how to make it more compatible with current AI algorithm
 Frontprop is an unsupervised learning algorithm - it does not try to optimise for specific expected output or a specific task, bur rather aims to produce useful representations of inputs, regardless of the domain. 
 Useful in the sense of capturing common patterns in the input data. 
 As such there is no explicit training objective and learning is achieved by continuously fitting to patterns in the incoming data and producing compressed (fewer-dimensional) representations of these patterns ([embeddings](https://developers.google.com/machine-learning/crash-course/embeddings)).
-This process can can be viewed as a way of (lossy) compression of the input data, which is what intelligence is thought to be (see [Ilya's talk](https://www.youtube.com/live/AKMuA_TVz3A?si=YgpcGdQPSE0VGdZg)).
+This process can be viewed as a way of (lossy) compression of the input data, which is what intelligence is thought to be (see [Ilya's talk](https://www.youtube.com/live/AKMuA_TVz3A?si=YgpcGdQPSE0VGdZg)).
 
-Such embeddings can then also be used as input for smaller adapter networks, trained in supervised manner for more specific, downstream tasks, for which expected outputs are easily available.
+Such embeddings can then also be used as input for smaller adapter networks, trained in supervised manner for more specific, downstream tasks, for which expected outputs are more easily available.
 
 In Frontprop, there is no separation between training and inference - it only uses forward pass (as opposed to "backprop") and each pass changes the network, to continuously adapt it to incoming data - similar to how organic brains are commonly assumed to work. 
 Consequently, there is no stop condition for training, and therefore the algorithm natively implements Continual Learning and should be able to naturally handle distribution shifts **[unverified]**, which are present in real world environments.
