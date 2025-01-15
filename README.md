@@ -142,7 +142,8 @@ neuronal behaviour (Hebb's rule).
 One drawback of the current logic is that multiple neurons may converge in the same spot,
 but implementing some form of [Lateral Inhibition](https://en.wikipedia.org/wiki/Lateral_inhibition) (which reportedly also takes place in the brain),
 for example via some "repelling force" or total energy minimisation, should prevent it
-(early "brute-force" implementation of this have shown that it does improve performance).
+(early "brute-force" implementation of such inhibition have shown that it does improve performance, 
+but a more efficient implementation is needed).
 
 Another weakness is that rare patterns will not attract neurons as much as frequent patterns
 (though this does not seem to be a strong effect, see below in [Observations](#observations)).
@@ -185,8 +186,8 @@ Frontprop is still very much work in progress, but some early, promising observa
 #### Learning simple patterns
 
 When presented with simple patterns in the input (see notebook [`analysis_simple_patterns_linear.ipynb`](/analysis_simple_patterns_linear.ipynb)),
-a single layer of Frontprop neurons robustly learns all patterns: neurons specialise in detecting each of them in a balanced way 
-- there's no strong bias towards any specific pattern attracting the majority of neurons.
+a single layer of Frontprop neurons robustly learns all patterns: neurons specialise in detecting each of them 
+in a balanced way - there's no strong bias towards any specific pattern attracting the majority of neurons.
 
 On average, the number of activated neurons is similar for all patterns and does not depend on pattern frequency, or the number of ones/zeros in the pattern
 (magnitude of the input vector).
