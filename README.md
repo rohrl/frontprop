@@ -27,9 +27,6 @@ Frontprop should also be less compute/memory demanding **[unverified]**, as it d
 
 ## How it works
 
-TODO: demo notebook
- [`frontprop_fast.ipynb`](https://github.com/rohrl/frontprop/blob/main/frontprop_fast.ipynb) notebook for a quick demo.
-
 Frontprop is a modification of the original [Hebb's rule](https://en.wikipedia.org/wiki/Hebbian_theory) (which is the commonly held belief on how neurons in our brains learn), applied to the artifical neuron - [Perceptron](https://en.wikipedia.org/wiki/Perceptron).
 
 Hebb's rule states that learning process in neurons is a consequence of reinforcing connections (synapses) that contributed to neuron firing (excitation).
@@ -179,7 +176,7 @@ There are 2 global hyperparameters that control learning process speed and the l
 
 To avoid the problem of weights reducing to zero or exploding to infinity, inputs are expected to be
 normalised to unitary vectors. Same normalisation is applied to weights and outputs.
-This may not be necessary though, as the algorithm used to work without it.
+(TODO: evaluate the effect of normalisation)
 
 ## Observations
 
@@ -205,17 +202,30 @@ see notebook [`analysis_simple_patterns_conv2d.ipynb`](/analysis_simple_patterns
 
 #### Learning MNIST
 
+See notebook [`analysis_mnist.ipynb`](/analysis_mnist.ipynb).
 
+##### Classification performance (MNIST)
 
-TODO: plot neurons count vs score on MNIST
+We measured the "goodness" of Frontprop output embeddings by training a simple Logistic Regression classifier on top of them,
+following the evaluation method used in the [Forward-Forward paper](https://arxiv.org/abs/2212.13345),
+which is another forward-pass only learning algorithm.
 
-#### Performance on classification (MNIST)
+Best performance achieved so far (after hyperparameter grid search):
 
-TODO: comparison to unsupervised (log probe, knn)
+| Accuracy | Neurons # | Epocchs # | `t_decay` | `lr` | Baseline: untrained |
+|----------|-----------|-----------|-----------|------|---------------------|
+| `0.9540` | 1000      | 1         | 0.0001    | 0.01 | `0.9469`            |
+| `0.9494` | 500       | 1         | 0.0001    | 0.01 | `0.9314`            |
+| `0.9318` | 200       | 1         | 0.0001    | 0.01 | `0.9167`            |
+| `0.9166` | 100       | 1         | 0.0001    | 0.01 | `0.8927`            |
+| `0.7898` | 20        | 1         | 0.0001    | 0.01 | `0.6694`            |
 
+The baseline is an untrained, randomly initialised Fronprop layer of same size.
 
+##### Other Baselines
 
-TOOD: conv layer detecting patterns
+- Logistic Regression directly on MNIST data: `92.5%` accuracy
+- KNN on embeddings clusters: `TODO`
 
 ---
 
@@ -248,7 +258,7 @@ TOOD: conv layer detecting patterns
 - [ ] evaluate in **continual learning** setting
 - [ ] evaluate in supervised setting: labels mixed into inputs in training
 - [ ] evaluate on more datasets (CIFAR, Fashion-MNIST etc.)
-- [ ] support parallel mini batches
+- [ ] support mini batches (multiple samples in parallel)
 - [ ] reduce neuron redundancy (neurons with similar weights) by sth like [Lateral Inhibition](https://en.wikipedia.org/wiki/Lateral_inhibition)
 - [ ] formal proof of convergence
 - [ ] try [Oja's Rule](https://en.wikipedia.org/wiki/Oja%27s_rule) weight update formula
@@ -311,29 +321,15 @@ which is much more efficient, cheaper, more sustainable and eco-friendly, and wi
 ## Limitations
 
 1. At the moment, additional layers do not improve results, when training from scratch (WIP)
-2. Bias is not supported.
-3. Needs some form of [Lateral Inhibition](https://en.wikipedia.org/wiki/Lateral_inhibition) to prevent more than one neuron converging on the same pattern, so that neurons are utilised more effectively.
-4. Current implementation lacks inhibition mechanism, which is known to exist in the brain and in AI models (negative weights). 
+2. At the moment samples are processed sequentially (mini-batches of size 1)
+3. Bias is not supported.
+4. Needs some form of [Lateral Inhibition](https://en.wikipedia.org/wiki/Lateral_inhibition) to prevent more than one neuron converging on the same pattern, so that neurons are utilised more effectively.
+5. Current implementation lacks inhibition mechanism, which is known to exist in the brain and in AI models (negative weights). 
 
 ---
-
-## Citation
-
-If you find this work useful in your research, please consider citing:
-
-```
-@software{frontprop,
-  author = {Pajak, K.},
-  title = {Frontprop},
-  url = {https://github.com/rohrl/frontprop},
-  year = {2024}
-}
-```
 
 ## License
 
 This project is licensed under GPL-3.0 and Creative Commons Attribution 4.0 International - see the [LICENSE](/LICENCE) file for details.
 
 © 2024 Karol Pajak. All rights reserved.
-
-karol.pajak AT gmail.com

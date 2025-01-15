@@ -10,7 +10,9 @@ class FpConv2d(nn.Conv2d):
     """
     Implements Frontprop 2D convolutional layer, as a torch module.
     Can be used as a direct replacement of torch's nn.Conv2d in CNN architectures.
-    At the moment only basic functionality is supported (in/out channels, stride and padding; bias is not supported!).
+    TODO:
+        At the moment only basic functionality is supported (in/out channels, stride and padding; bias is not supported!).
+        Mini-batches are processed sequentially
     """
     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, groups=1, bias=False,
                  padding_mode='zeros', t_decay=T_DECAY_DEFAULT, w_boost=W_BOOST_DEFAULT, device=None, dtype=None):
@@ -85,14 +87,17 @@ class FpConv2d(nn.Conv2d):
         return padded_sample[:, in_h: in_h + self.kernel_size, in_w: in_w + self.kernel_size]
 
     def forward(self, mini_batch):
-        # mini_batch.shape = (batch_size, in_channels, in_h, in_w)
+        """
+        Forward pass for the layer.
+        :param mini_batch: input data of shape (batch_size, in_channels, in_h, in_w)
+        """
 
         # TODO: currently mini batch is done sequentially
 
         outputs = []
 
         for sample in mini_batch:
-            out = self.forward_single(sample)
+            out = self.forward_single(sample, apply_threshold)
             outputs.append(out)
 
         return torch.stack(outputs)

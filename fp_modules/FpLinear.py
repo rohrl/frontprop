@@ -9,7 +9,8 @@ class FpLinear(nn.Linear):
     """
     Implements Frontprop fully connected layer, as a torch module.
     Can be used as a direct replacement of nn.Linear layer.
-    At the moment bias is not supported.
+    TODO:
+        At the moment bias is not supported; mini-batches are processed sequentially
     """
 
     def __init__(self, in_features, out_features, bias=False, t_decay=T_DECAY_DEFAULT, w_boost=W_BOOST_DEFAULT,
@@ -59,6 +60,7 @@ class FpLinear(nn.Linear):
 
     def forward_single_sample(self, data):
 
+        # Short circuit if input is all zeros
         if torch.all(data == 0):
             return torch.zeros(self.out_features, device=self.device, dtype=self.weight.dtype)
 
@@ -83,28 +85,38 @@ class FpLinear(nn.Linear):
 
         return output
 
-    def forward(self, input):
+    def forward(self, input, apply_threshold=True):
+        """
+        Forward pass for the layer.
+        :param input: input data of shape (batch_size, in_features)
+        :param apply_threshold: whether to apply the activation function to the output.
+        """
         # FIXME:
-        # As of now, samples are just processed sequentially, for simplicity.
+        # As of now, samples are just processed sequentially, for simplicity
+        #   TODO: when frozen could support parallel
 
-        assert input.shape == (input.shape[0], self.in_features)
+        batch_size = input.shape[0]
 
-        self.output = torch.zeros(input.shape[0], self.out_features, device=self.device, dtype=self.weight.dtype)
+        assert input.shape == (batch_size, self.in_features)
+
+        self.output = torch.zeros(batch_size, self.out_features, device=self.device, dtype=self.weight.dtype)
 
         for i, sample in enumerate(input):
             sample_out = self.forward_single_sample(sample)
             self.output[i] = sample_out
 
-        assert self.output.shape == (input.shape[0], self.out_features)
+        assert self.output.shape == (batch_size, self.out_features)
 
-        # ReLU-like non-linear transformation via cutoff threshold
-        #
-        #   TODO: Should we output the absolute value or only the diff above threshold ?
-        #   (note the threshold changes on each pass)
-        self.output = torch.where(self.output >= self.t, self.output, torch.zeros_like(self.output))
+        if apply_threshold:
+            # ReLU-like non-linear transformation via cutoff threshold
+            #
+            #   TODO: Should we output the absolute value or only the diff above threshold ?
+            #   (note the threshold changes on each pass)
+            self.output = torch.where(self.output >= self.t, self.output, torch.zeros_like(self.output))
 
-        # project outputs onto a sphere, as expected by downstream layer
-        self.output = self.__normalise_unitary(self.output, dim=1)
+            # project outputs onto a sphere, as expected by downstream layer
+            self.output = self.__normalise_unitary(self.output, dim=1)
+            self.output = torch.nan_to_num(self.output, nan=0.0)
 
         return self.output
 
@@ -112,15 +124,19 @@ class FpLinear(nn.Linear):
         raise Exception("Backward pass not implemented for FrontPropConv2d")
 
     def freeze(self):
+        """Disable updates to weights and thresholds."""
         self.frozen = True
 
     def unfreeze(self):
+        """Enable updates to weights and thresholds."""
         self.frozen = False
 
     def get_size(self):
         return (self.in_features, self.out_features)
 
     def __assert(self):
+        """Internal assertions to check the state of the module."""
+        
         assert self.weight.shape == (self.out_features, self.in_features)
         assert self.t.shape == (self.out_features,)
 
