@@ -249,6 +249,7 @@ The baseline is an untrained, randomly initialised Fronprop layer of same size.
 - [x] research existing *forward learning* methods
 - [x] HP grid search
 - [x] fast implementation of *Frontprop* `Linear` and `Conv2D` layers in `torch` (see `fp_modules/`)
+- [ ] support mini batches (multiple samples in parallel) - WIP
 
 ### TODO  
 
@@ -259,7 +260,6 @@ The baseline is an untrained, randomly initialised Fronprop layer of same size.
 - [ ] evaluate in **continual learning** setting
 - [ ] evaluate in supervised setting: labels mixed into inputs in training
 - [ ] evaluate on more datasets (CIFAR, Fashion-MNIST etc.)
-- [ ] support mini batches (multiple samples in parallel)
 - [ ] reduce neuron redundancy (neurons with similar weights) by sth like [Lateral Inhibition](https://en.wikipedia.org/wiki/Lateral_inhibition)
 - [ ] formal proof of convergence
 - [ ] try [Oja's Rule](https://en.wikipedia.org/wiki/Oja%27s_rule) weight update formula
@@ -322,7 +322,7 @@ which is much more efficient, cheaper, more sustainable and eco-friendly, and wi
 ## Limitations
 
 1. At the moment, additional layers do not improve results, when training from scratch (WIP)
-2. At the moment samples in mini-batches are processed sequentially
+2. At the moment samples in mini-batches are processed sequentially, parallel processing is WIP
 3. Bias is not supported.
 4. Needs some form of [Lateral Inhibition](https://en.wikipedia.org/wiki/Lateral_inhibition) to prevent more than one neuron converging on the same pattern, so that neurons are utilised more effectively.
 5. Current implementation lacks inhibition mechanism, which is known to exist in the brain and in AI models (negative weights). 
