@@ -18,7 +18,7 @@ In Frontprop, there is no separation between training and inference - it only us
 Consequently, there is no stop condition for training, and therefore the algorithm natively implements Continual Learning and should be able to naturally handle distribution shifts **[unverified]**, which are present in real world environments.
 
 In most cases Frontprop should be easy to adapt to modern Neural Network architectures (e.g. CNNs, Transformers), just by replacing backpropagation, without modifications to the model architecture.
-Current implementation includes a [`FpLinear`](./torch_module/FpLinear.py) and [`FpConv2d`](./torch_module/FpConv2d.py) layers, implemented as `torch` modules. 
+Current implementation includes a [`FpLinear`](fp_modules/FpLinear.py) and [`FpConv2d`](fp_modules/FpConv2d.py) layers, implemented as `torch` modules. 
 They can be used to replace their corresponding backpropagation layers (see [Limitations](#limitations)), for easy experimentation with existing architectures.
 
 Frontprop should also be less compute/memory demanding **[unverified]**, as it does not have to store activations, nor perform the backward pass.
@@ -58,8 +58,8 @@ The layer's output is a **vector** of all individual neurons outputs.
 $\mathbf{y} = \phi(\mathbf{W} \mathbf{x} + \mathbf{b})$
 
 Such layer design is used in a Linear layer (a.k.a. "fully connected" or "feed forward") in AI models 
-(e.g. [`torch.nn.Linear`](https://pytorch.org/docs/stable/generated/torch.nn.Linear.html)), and also in a Frontprop linear layer [`FpLinear`](./torch_module/FpLinear.py).
-Currently Frontprop also implements a convolutional layer [`FpConv2d`](./torch_module/FpConv2d.py), similar to `torch.nn.Conv2D`.
+(e.g. [`torch.nn.Linear`](https://pytorch.org/docs/stable/generated/torch.nn.Linear.html)), and also in a Frontprop linear layer [`FpLinear`](fp_modules/FpLinear.py).
+Currently Frontprop also implements a convolutional layer [`FpConv2d`](fp_modules/FpConv2d.py), similar to `torch.nn.Conv2D`.
 
 
 #### Learning algorithm and weight update rule
@@ -84,7 +84,7 @@ else:
 
 If neuron was activated (excited) with the input (i.e. the product exceeded the activation threshold),
 the weights are updated (see the update rule [below](#update-rule)) and the product is the output
-(the "job" of activation function is implicitly realised by the excitation threshold, explained [below](#activation-function)).
+(the "job" of activation function is implicitly realised by the excitation threshold, explained [below](#on-activation-function-and-bias)).
 
 If the neuron was not activated, the activation threshold is lowered by a small amount, and the output is `0`.
 
@@ -185,13 +185,35 @@ This may not be necessary though, as the algorithm used to work without it.
 
 Frontprop is still very much work in progress, but some early, promising observations have been made.
 
-TODO: converging on simple patterns (+stability)
+#### Learning simple patterns
 
-TODO: pattern probability and noise impact
+When presented with simple patterns in the input (see notebook [`analysis_simple_patterns_linear.ipynb`](/analysis_simple_patterns_linear.ipynb)),
+a single layer of Frontprop neurons robustly learns all patterns: neurons specialise in detecting each of them in a balanced way 
+- there's no strong bias towards any specific pattern attracting the majority of neurons.
+
+On average, the number of activated neurons is similar for all patterns and does not depend on pattern frequency, or the number of ones/zeros in the pattern
+(magnitude of the input vector).
+
+Even with pattern frequency imbalance of 10:1, the network is not affected and produces full coverage.
+(TODO: plot).
+
+Noise does not affect convergence either, but larger amount of noise do slow down learning (as expected).
+(TODO: plot).
+
+Frontprop convolutional layer (`FpConv2d`) similarly learns the patterns - 
+see notebook [`analysis_simple_patterns_conv2d.ipynb`](/analysis_simple_patterns_conv2d.ipynb).
+
+#### Learning MNIST
+
+
+
+TODO: plot neurons count vs score on MNIST
+
+#### Performance on classification (MNIST)
 
 TODO: comparison to unsupervised (log probe, knn)
 
-TODO: plot neurons count vs score on MNIST
+
 
 TOOD: conv layer detecting patterns
 
@@ -215,7 +237,7 @@ TOOD: conv layer detecting patterns
   - [x] randomly initialized, untrained 
 - [x] research existing *forward learning* methods
 - [x] HP grid search
-- [x] fast implementation of *Frontprop* `Linear` and `Conv2D` layers in `torch` (see `torch_module/`)
+- [x] fast implementation of *Frontprop* `Linear` and `Conv2D` layers in `torch` (see `fp_modules/`)
 
 ### TODO / In progress
 
@@ -310,7 +332,7 @@ If you find this work useful in your research, please consider citing:
 
 ## License
 
-This project is licensed under GPL-3.0 and Creative Commons Attribution 4.0 International - see the [LICENSE](LICENSE) file for details.
+This project is licensed under GPL-3.0 and Creative Commons Attribution 4.0 International - see the [LICENSE](/LICENCE) file for details.
 
 © 2024 Karol Pajak. All rights reserved.
 

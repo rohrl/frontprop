@@ -1,5 +1,6 @@
 # TODO: pin versions
 torch
+torchvision
 numpy
 matplotlib
 seaborn
