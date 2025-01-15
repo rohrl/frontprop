@@ -14,12 +14,12 @@ This process can can be viewed as a way of (lossy) compression of the input data
 
 Such embeddings can then also be used as input for smaller adapter networks, trained in supervised manner for more specific, downstream tasks, for which expected outputs are easily available.
 
-In Frontprop, there is no separation between training and inference - it only uses forward pass (as opposed to "backprop") and each pass changes the network, to continuously adapt it to incoming data - similar to how organic brains are commonly assumed to work. 
+In Frontprop, there is no separation between training and inference - it only uses forward pass (as opposed to "backprop") and each pass may change the network, to continuously adapt it to incoming data - similar to how organic brains are commonly assumed to work. 
 Consequently, there is no stop condition for training, and therefore the algorithm natively implements Continual Learning and should be able to naturally handle distribution shifts **[unverified]**, which are present in real world environments.
 
 In most cases Frontprop should be easy to adapt to modern Neural Network architectures (e.g. CNNs, Transformers), just by replacing backpropagation, without modifications to the model architecture.
 Current implementation includes a [`FpLinear`](./torch_module/FpLinear.py) and [`FpConv2d`](./torch_module/FpConv2d.py) layers, implemented as `torch` modules. 
-They can be used to replace its corresponding backpropagation layers (see [Limitations](#limitations)), for easy experimentation with existing architectures.
+They can be used to replace their corresponding backpropagation layers (see [Limitations](#limitations)), for easy experimentation with existing architectures.
 
 Frontprop should also be less compute/memory demanding **[unverified]**, as it does not have to store activations, nor perform the backward pass.
 
@@ -84,22 +84,22 @@ else:
 
 If neuron was activated (excited) with the input (i.e. the product exceeded the activation threshold),
 the weights are updated (see the update rule [below](#update-rule)) and the product is the output
-(the "job" of activation function is implicitly realised by the excitation threshold, explained [below](#activation-function).
+(the "job" of activation function is implicitly realised by the excitation threshold, explained [below](#activation-function)).
 
 If the neuron was not activated, the activation threshold is lowered by a small amount, and the output is `0`.
 
-Neurons weights are randomly initialized at the beginning of the training.
+Neurons weights are randomly initialized at the beginning of the training (Gaussian distribution).
 
 #### Update rule
 
 Weights are updated following the Hebb's principle, i.e. reinforce the connections that contributed to the activation.
-This can be implemented in a multitude of ways, but I found the following simple logic to work well:
+This can be implemented in a **multitude of ways**, which can be further researched, but I found the following simple logic to work well:
 
 $\Delta\mathbf{w} = \lambda(\mathbf{x} - \mathbf{w})$
 
 $\mathbf{w} := \mathbf{w} + \Delta\mathbf{w}$
 
-where the change is simply a vector subtraction (in high dimensional space), 
+where the change is simply a vector subtraction (as in picture below, but in high dimensional space), 
 scaled by the learning rate $\lambda$ (which in code is called `weight_boost`).
 
 ![](https://upload.wikimedia.org/wikipedia/commons/2/24/Vector_subtraction.svg)
@@ -113,7 +113,7 @@ Our simple update rule is in fact similar to [Oja's rule](https://en.wikipedia.o
 $\Delta\mathbf{w} = \lambda y (\mathbf{x} - y \mathbf{w})$
 
 except in Oja's rule:
-1. weights are always updated and the update "strength" is proportional to the activation (1st $y$), 
+1. weights are always updated and the update "strength" is proportional to the activation (1st $y$ in Oja's formula), 
 while in Frontprop it's discrete: no update if activation is below the threshold,
 2. the update vector is additionally "boosted" by the activation "strength" (2nd $y$)
 
@@ -127,10 +127,10 @@ as points in the high-dimensional embedding space, representing some abstract me
 At the beginning there is hardly any activations, so neurons keep lowering their thresholds.
 
 Imagine the neuron's weight vector as a point in this space, and activation threshold being
-a radius of a hypersphere centered in that point.
+a radius (technically a reciprocal of the radius: `1/R`) of a hypersphere centered in that point.
 
 The hypersphere radius keeps growing (i.e. threshold lowering) until it spans a region of input space
-where signals happen to be present. This will cause the neuron to fire, and so trigger
+where signals (inputs) happen to be present. This will cause the neuron to fire, and so trigger
 the weight update, which will effectively move the hypersphere slightly closer to the input.
 
 Eventually, neurons will specialise in firing for repeating/dominant patterns in inputs,
@@ -241,7 +241,7 @@ TOOD: conv layer detecting patterns
 
 The motivation for the research behind Frontprop is to seek alternative learning algorithms to backpropagation, which are more similar to how biological brains learn.
 
-My personal intuition, from watching how babies learn, is that it's fully unsupervised, where they just observe the world, 
+My personal intuition, based on observation of how babies learn for example, is that it's fully unsupervised, where they just observe the world, 
 trying to pick up on patterns and correlations, which later can be used to make predictions about their environment.
 Only later, once this foundational "pretraining" is complete, we use "labels" (expected outputs) to augment our learning (i.e. supervised learning).
 
@@ -268,7 +268,7 @@ While there is a growing research on decentralised training, it is still in its 
 
 Training techniques that use only local learning, like Frontprop, if proven to work, could facilitate massively distributed and decentralised training,
 which is much more efficient, cheaper, more sustainable and eco-friendly, and will unlock next level scale of compute
-(see Pluralis Research [in-depth article](https://www.pluralisresearch.com/i/146390174/myth-the-swarm-can-never-get-big-enough) on the case for decentralised learning])
+(see Pluralis Research [in-depth article](https://www.pluralisresearch.com/i/146390174/myth-the-swarm-can-never-get-big-enough) on the case for decentralised learning)
 
 ---
 
@@ -307,3 +307,11 @@ If you find this work useful in your research, please consider citing:
   year = {2024}
 }
 ```
+
+## License
+
+This project is licensed under GPL-3.0 and Creative Commons Attribution 4.0 International - see the [LICENSE](LICENSE) file for details.
+
+© 2024 Karol Pajak. All rights reserved.
+
+karol.pajak AT gmail.com

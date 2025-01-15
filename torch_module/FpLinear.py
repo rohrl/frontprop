@@ -7,7 +7,7 @@ W_BOOST_DEFAULT = 0.02
 
 class FpLinear(nn.Linear):
     """
-    This is an implementation of Frontprop fully connected layer, as a torch module.
+    Implements Frontprop fully connected layer, as a torch module.
     Can be used as a direct replacement of nn.Linear layer.
     At the moment bias is not supported.
     """

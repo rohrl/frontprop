@@ -8,7 +8,7 @@ W_BOOST_DEFAULT = 0.02
 
 class FpConv2d(nn.Conv2d):
     """
-    This is an implementation of Frontprop 2D convolutional layer, as a torch module.
+    Implements Frontprop 2D convolutional layer, as a torch module.
     Can be used as a direct replacement of torch's nn.Conv2d in CNN architectures.
     At the moment only basic functionality is supported (in/out channels, stride and padding; bias is not supported!).
     """
