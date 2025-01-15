@@ -175,9 +175,9 @@ There are 2 global hyperparameters that control learning process speed and the l
 
 #### Normalization
 
-To avoid the problem of weights reducing to zero or exploding to infinity, inputs are expected to be
-normalised to unitary vectors. Same normalisation is applied to weights and outputs.
-(TODO: evaluate the effect of normalisation)
+Normalization was added to avoid the problem of weights reducing to zero or exploding to infinity:
+inputs are expected to be normalised to unitary vectors. Same normalization is applied to weights and outputs.
+(TODO: evaluate the impact of normalization)
 
 ## Observations
 
