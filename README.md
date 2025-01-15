@@ -312,8 +312,6 @@ If you find this work useful in your research, please consider citing:
 
 This project is licensed under GPL-3.0 and Creative Commons Attribution 4.0 International - see the [LICENSE](LICENSE) file for details.
 
-`tl;dr:`you're free to use and share, but with attribution to the author.
-
 © 2024 Karol Pajak. All rights reserved.
 
 karol.pajak AT gmail.com
