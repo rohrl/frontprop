@@ -232,7 +232,7 @@ The baseline is an untrained, randomly initialised Fronprop layer of same size.
 
 ## Roadmap
 
-### Done
+### Done / In progress
 
 - [x] verify convergence (empirically, no proof)
 - [x] compare single layer Frontprop to baselines:
@@ -240,9 +240,9 @@ The baseline is an untrained, randomly initialised Fronprop layer of same size.
     - [x] LogReg
     - [ ] CNN
   - [x] unsupervised
-    - [x] KMeans
-      - [x] with trained LogReg probe
-      - [x] with KNN
+    - [ ] KMeans
+      - [ ] with trained LogReg probe
+      - [ ] with KNN
     - [x] Forward-Forward
     - [ ] PCA
   - [x] randomly initialized, untrained 
@@ -250,7 +250,7 @@ The baseline is an untrained, randomly initialised Fronprop layer of same size.
 - [x] HP grid search
 - [x] fast implementation of *Frontprop* `Linear` and `Conv2D` layers in `torch` (see `fp_modules/`)
 
-### TODO / In progress
+### TODO  
 
 - [ ] **use Frontprop to fine-tune a pretrained language model**
 - [ ] use Frontprop to train/fine-tune a CNN
