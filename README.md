@@ -215,7 +215,7 @@ So far best Frontprop performance is achieved with single layer, multi-layer req
 
 Best performance achieved so far (after hyperparameter grid search):
 
-| Accuracy | Neurons # | Epochs # | `t_decay` | `lr` | Baseline: untrained |
+| Accuracy | Emb (layer) size  | Epochs # | `t_decay` | `lr` | Baseline: untrained |
 |----------|-----------|-----------|-----------|------|---------------------|
 | `0.9540` | 1000      | 1         | 0.0001    | 0.01 | `0.9469`            |
 | `0.9494` | 500       | 1         | 0.0001    | 0.01 | `0.9314`            |
@@ -231,8 +231,9 @@ Best performance achieved so far (after hyperparameter grid search):
 - [Forward-Forward](https://arxiv.org/abs/2212.13345): `98%` accuracy
 
 
-A LogReg probe on Frontprop embeddings of smaller dimension (`dim = neurons #`) than the original input (`784`) slightly outperforms a LogReg trained on the original inputs.
-We conclude that this is indicative of Frontprop's potential to create dense representations of the input, but further research is needed.
+A LogReg probe on Frontprop embeddings of smaller dimension than the original input (`784`) slightly outperforms a LogReg trained on the original inputs.
+We conclude that this is indicative of Frontprop's potential to create dense representations of the input, but further research is needed,
+especially into multi-layer performance.
 Additionally, the lower accuracy when using an untrained, randomly initialised layer of same size shows that indeed the improvement comes from the Frontprop learning process.
 
 ---
