@@ -225,13 +225,13 @@ Best performance achieved so far (after hyperparameter grid search):
 
 ##### Baselines
 
-- Logistic Regression directly on MNIST data: `92.5%` accuracy
+- Logistic Regression directly on MNIST data (dim = `28x28=784`): `92.5%` accuracy
 - Untrained, randomly initialised layer of same size: (see last column in the table above)
 - KNN on embeddings clusters: `TODO`
 - [Forward-Forward](https://arxiv.org/abs/2212.13345): `98%` accuracy
 
 
-A LogReg probe on Frontprop embeddings of smaller dimension than the original input slightly outperforms a LogReg trained on the original inputs.
+A LogReg probe on Frontprop embeddings of smaller dimension (`dim = neurons #`) than the original input (`784`) slightly outperforms a LogReg trained on the original inputs.
 We conclude that this is indicative of Frontprop's potential to create dense representations of the input, but further research is needed.
 Additionally, the lower accuracy when using an untrained, randomly initialised layer of same size shows that indeed the improvement comes from the Frontprop learning process.
 
