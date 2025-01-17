@@ -331,7 +331,6 @@ which is much more efficient, cheaper, more sustainable and eco-friendly, and wi
 
 1. At the moment, additional layers do not improve results, when training from scratch (WIP)
 2. At the moment samples in mini-batches are processed sequentially, parallel processing is WIP
-3. Bias is not supported.
 4. Needs some form of [Lateral Inhibition](https://en.wikipedia.org/wiki/Lateral_inhibition) to prevent more than one neuron converging on the same pattern, so that neurons are utilised more effectively.
 5. Current implementation lacks inhibition mechanism, which is known to exist in the brain and in AI models (negative weights). 
 
