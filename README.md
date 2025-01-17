@@ -205,15 +205,17 @@ see notebook [`analysis_simple_patterns_conv2d.ipynb`](/analysis_simple_patterns
 
 See notebook [`analysis_mnist.ipynb`](/analysis_mnist.ipynb).
 
-##### Classification performance (MNIST)
+##### Classification performance (MNIST) [WIP]
 
 We measured the "goodness" of Frontprop output embeddings by training a simple Logistic Regression classifier on top of them,
 following the evaluation method used in the [Forward-Forward paper](https://arxiv.org/abs/2212.13345),
-which is another forward-pass only learning algorithm.
+which is another forward-pass only learning algorithm (achieving approx. 98% on MNIST, but with multiple layers)
+
+So far best Frontprop performance is achieved with single layer, multi-layer requires more investigation.
 
 Best performance achieved so far (after hyperparameter grid search):
 
-| Accuracy | Neurons # | Epocchs # | `t_decay` | `lr` | Baseline: untrained |
+| Accuracy | Neurons # | Epochs # | `t_decay` | `lr` | Baseline: untrained |
 |----------|-----------|-----------|-----------|------|---------------------|
 | `0.9540` | 1000      | 1         | 0.0001    | 0.01 | `0.9469`            |
 | `0.9494` | 500       | 1         | 0.0001    | 0.01 | `0.9314`            |
@@ -221,12 +223,17 @@ Best performance achieved so far (after hyperparameter grid search):
 | `0.9166` | 100       | 1         | 0.0001    | 0.01 | `0.8927`            |
 | `0.7898` | 20        | 1         | 0.0001    | 0.01 | `0.6694`            |
 
-The baseline is an untrained, randomly initialised Fronprop layer of same size.
-
-##### Other Baselines
+##### Baselines
 
 - Logistic Regression directly on MNIST data: `92.5%` accuracy
+- Untrained, randomly initialised layer of same size: (see last column in the table above)
 - KNN on embeddings clusters: `TODO`
+- [Forward-Forward](https://arxiv.org/abs/2212.13345): `98%` accuracy
+
+
+A LogReg probe on Frontprop embeddings of smaller dimension than the original input slightly outperforms a LogReg trained on the original inputs.
+We conclude that this is indicative of Frontprop's potential to create dense representations of the input, but further research is needed.
+Additionally, the lower accuracy when using an untrained, randomly initialised layer of same size shows that indeed the improvement comes from the Frontprop learning process.
 
 ---
 
