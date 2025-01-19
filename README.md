@@ -152,7 +152,7 @@ could be another solution
 (as in rare patterns carrying more information, which can be measured using [Shannon entropy](https://en.wikipedia.org/wiki/Entropy_(information_theory)))
 (<- TODO).
 
-* <sup>technically, because of [normalization](#normalization) all points are on a hypersphere surface and the threshold represents a `n-1` dimensional circle on the surface of this sphere.</sup>
+\* <sup>technically, because of [normalization](#normalization) all points are on a hypersphere surface and the threshold represents a `n-1` dimensional circle on the surface of this sphere.</sup>
 
 #### On activation function and bias
 
