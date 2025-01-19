@@ -124,7 +124,7 @@ as points in the high-dimensional embedding space, representing some abstract me
 At the beginning there is hardly any activations, so neurons keep lowering their thresholds.
 
 Imagine the neuron's weight vector as a point in this space, and activation threshold being
-a radius (technically a reciprocal of the radius: `1/R`) of a hypersphere centered in that point.
+a radius (technically a reciprocal of the radius: `1/R`) of a hypersphere* centered in that point.
 
 The hypersphere radius keeps growing (i.e. threshold lowering) until it spans a region of input space
 where signals (inputs) happen to be present. This will cause the neuron to fire, and so trigger
@@ -151,6 +151,8 @@ The above Lateral Inhibition should help, but perhaps optimising some entropy-in
 could be another solution 
 (as in rare patterns carrying more information, which can be measured using [Shannon entropy](https://en.wikipedia.org/wiki/Entropy_(information_theory)))
 (<- TODO).
+
+* <sup>technically, because of [normalization](#normalization) all points are on a hypersphere surface and the threshold represents a `n-1` dimensional circle on the surface of this sphere.</sup>
 
 #### On activation function and bias
 
